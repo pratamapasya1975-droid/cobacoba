@@ -3,86 +3,45 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ABRAR-QU Pro: Camera & RFID Scanner</title>
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <title>ABRAR-QU QR Pro</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode"></script>
   
   <style>
     :root{
-      --bg: #030712;
-      --card-bg: rgba(31, 41, 55, 0.8);
-      --primary: #10b981;
-      --secondary: #3b82f6;
-      --text: #f3f4f6;
-      --muted: #9ca3af;
-      --radius: 16px;
+      --bg: #030712; --card-bg: rgba(31, 41, 55, 0.8);
+      --primary: #10b981; --secondary: #3b82f6;
+      --text: #f3f4f6; --muted: #9ca3af; --radius: 16px;
     }
-
     body{
       margin: 0; background-color: var(--bg); color: var(--text);
-      font-family: 'Inter', sans-serif;
-      background-image: radial-gradient(circle at top right, #1e293b, #030712);
-      min-height: 100vh;
+      font-family: 'Inter', sans-serif; min-height: 100vh;
     }
-
-    .container{ max-width: 1200px; margin: 0 auto; padding: 30px; }
-
-    /* HEADER */
+    .container{ max-width: 1200px; margin: 0 auto; padding: 20px; }
     .header{
-      display: flex; align-items: center; gap: 20px; padding: 20px;
+      display: flex; align-items: center; gap: 15px; padding: 20px;
       background: var(--card-bg); border-radius: var(--radius);
-      backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
-      margin-bottom: 25px;
+      border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;
     }
-    .logo-img { width: 65px; height: 65px; border-radius: 12px; border: 2px solid var(--primary); object-fit: cover; }
-
-    /* GRID */
-    .grid{ display: grid; grid-template-columns: 380px 1fr; gap: 25px; }
-
+    .logo-img { width: 50px; height: 50px; border-radius: 10px; border: 2px solid var(--primary); }
+    .grid{ display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
     .card{
-      background: var(--card-bg); padding: 25px; border-radius: var(--radius);
-      border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
-      position: relative;
+      background: var(--card-bg); padding: 20px; border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.1);
     }
-
-    /* CAMERA SCANNER BOX */
-    #reader {
-      width: 100%;
-      background: #000;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 2px solid var(--primary);
-      margin-bottom: 15px;
-      display: none; /* Hidden by default */
-    }
-
-    /* BARCODE AREA */
-    .barcode-box { background: #fff; padding: 15px; border-radius: 10px; margin: 15px 0; display: flex; justify-content: center; }
-    #barcode { width: 100%; max-width: 250px; }
-
+    /* QR BOX */
+    #qrcode { background: #fff; padding: 15px; border-radius: 12px; display: inline-block; margin: 15px 0; }
+    #reader { width: 100%; border-radius: 12px; overflow: hidden; border: 2px solid var(--primary); display: none; margin-bottom: 15px; }
     /* TABLE */
-    .table-wrapper { overflow-y: auto; max-height: 500px; margin-top: 15px; border-radius: 8px; }
-    table { width: 100%; border-collapse: collapse; text-align: left; }
-    th { position: sticky; top: 0; background: #111827; padding: 15px; font-size: 13px; color: var(--primary); }
-    td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
-
-    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; background: rgba(16, 185, 129, 0.2); color: #34d399; }
-
-    /* BUTTONS */
+    .table-wrapper { overflow-y: auto; max-height: 500px; margin-top: 15px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { position: sticky; top: 0; background: #111827; padding: 12px; color: var(--primary); text-align: left; }
+    td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
     .btn {
-      padding: 12px 20px; border-radius: 10px; border: none; cursor: pointer;
-      font-weight: 600; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; width: 100%; justify-content: center; margin-bottom: 10px;
+      padding: 12px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px;
     }
     .btn-camera { background: var(--primary); color: #000; }
-    .btn-print { background: var(--secondary); color: white; width: auto; }
-
-    @media print {
-      .header, .grid > :first-child, .btn-print { display: none !important; }
-      body { background: white; color: black; }
-      .card { border: none; background: transparent; padding: 0; }
-      td, th { border: 1px solid #ddd; color: black !important; }
-    }
-
+    @media print { .header, .btn, .grid > :first-child { display: none; } body { color: black; background: white; } }
     @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -92,44 +51,32 @@
   <div class="header">
     <img src="logo.jpg" alt="Logo" class="logo-img">
     <div style="flex-grow: 1;">
-      <h1 style="margin:0; font-size: 22px;">ABRAR-QU <span style="color: var(--primary);">HYBRID SCAN</span></h1>
-      <small style="color:var(--muted)">RFID • Barcode • Camera Camera Active</small>
+      <h1 style="margin:0; font-size: 20px;">ABRAR-QU <span style="color: var(--primary);">QR SYSTEM</span></h1>
+      <small id="syncStatus" style="color:var(--muted)">Menghubungkan ke Python...</small>
     </div>
-    <button class="btn btn-print" onclick="window.print()">🖨️ Cetak</button>
+    <button class="btn" style="width:auto; background:var(--secondary); color:white" onclick="window.print()">Cetak</button>
   </div>
 
   <div class="grid">
-    <div class="card">
-      <h3>Scanner Control</h3>
-      
+    <div class="card" style="text-align: center;">
+      <h3 style="margin-top:0">Scan Point</h3>
       <div id="reader"></div>
-      
-      <button class="btn btn-camera" id="startCamBtn">📸 Aktifkan Kamera Scan</button>
-      <button class="btn" id="stopCamBtn" style="display:none; background: #ef4444; color:white;">🛑 Matikan Kamera</button>
+      <button class="btn btn-camera" id="startCamBtn">📸 Buka Kamera Absen</button>
+      <button class="btn" id="stopCamBtn" style="display:none; background:#ef4444; color:white;">🛑 Tutup Kamera</button>
 
-      <div style="margin: 20px 0; text-align: center; color: var(--muted); font-size: 12px;">--- ATAU SCAN RFID/BARCODE FISIK ---</div>
-
-      <div class="barcode-box">
-        <svg id="barcode"></svg>
+      <div style="margin: 15px 0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+        <small style="color:var(--muted)">ID PERANGKAT ANDA:</small><br>
+        <div id="qrcode"></div>
+        <div id="tokenText" style="font-family: monospace; font-weight: bold; color: var(--primary);"></div>
       </div>
-      <div id="tokenID" style="text-align:center; font-family:monospace; font-weight:bold; color:var(--primary)">---</div>
     </div>
 
     <div class="card">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin:0">Live Attendance Log</h3>
-        <small id="syncStatus" style="color:var(--muted)">Menunggu data...</small>
-      </div>
-
+      <h3 style="margin:0">Log Kehadiran Real-Time</h3>
       <div class="table-wrapper">
         <table>
           <thead>
-            <tr>
-              <th>WAKTU</th>
-              <th>USER / ID</th>
-              <th>METODE</th>
-              <th>STATUS</th>
-            </tr>
+            <tr><th>WAKTU</th><th>ID USER</th><th>METODE</th></tr>
           </thead>
           <tbody id="historyBody"></tbody>
         </table>
@@ -139,171 +86,74 @@
 </div>
 
 <script>
+  const SERVER_URL = "http://" + window.location.hostname + ":5000";
   let html5QrCode;
-  const historyBody = document.getElementById('historyBody');
 
-  // 1. Inisialisasi ID Lokal
-  function init() {
+  // 1. Generate QR Code untuk Perangkat Ini
+  function initQR() {
     let id = localStorage.getItem('abrar_token') || "AQ-" + Math.random().toString(36).substr(2, 7).toUpperCase();
     localStorage.setItem('abrar_token', id);
-    JsBarcode("#barcode", id, { format: "CODE128", width: 2, height: 50, displayValue: false });
-    document.getElementById('tokenID').innerText = id;
+    document.getElementById('tokenText').innerText = id;
+    new QRCode(document.getElementById("qrcode"), { text: id, width: 150, height: 150 });
   }
 
-  // 2. FUNGSI UTAMA: PROSES ABSENSI (Digunakan Kamera & Scanner Fisik)
-  function processAttendance(scannedID, method = "CAMERA") {
-    // Hindari scan ganda dalam waktu singkat
+  // 2. Fungsi Kirim Absen ke Python
+  async function processAttendance(scannedID, method = "QR_CAM") {
     if (window.lastScan === scannedID && Date.now() - window.lastScanTime < 3000) return;
-    
-    window.lastScan = scannedID;
-    window.lastScanTime = Date.now();
+    window.lastScan = scannedID; window.lastScanTime = Date.now();
 
-    // Suara Beep
     new Audio('https://www.soundjay.com/buttons/beep-07a.mp3').play();
-
-    const now = new Date();
-    const row = document.createElement('tr');
-    row.style.background = "rgba(16, 185, 129, 0.15)";
-    row.innerHTML = `
-      <td><b>${now.toLocaleTimeString()}</b></td>
-      <td><code style="color:var(--secondary)">${scannedID}</code></td>
-      <td><small>${method}</small></td>
-      <td><span class="status-badge">TERCATAT</span></td>
-    `;
-    historyBody.prepend(row);
     
-    document.getElementById('syncStatus').innerText = "Data baru masuk: " + scannedID;
-
-    // Simulasi Kirim ke Server
-    console.log("Mengirim ke server:", scannedID);
+    try {
+      await fetch(`${SERVER_URL}/api/scan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: scannedID, metode: method })
+      });
+      loadHistory();
+    } catch (err) { console.error("Offline"); }
   }
 
-  // 3. LOGIKA OPSI 3: KAMERA HP/LAPTOP
-  const startCamBtn = document.getElementById('startCamBtn');
-  const stopCamBtn = document.getElementById('stopCamBtn');
-  const reader = document.getElementById('reader');
+  // 3. Ambil Data History dari Python
+  async function loadHistory() {
+    try {
+      const res = await fetch(`${SERVER_URL}/api/history`);
+      const data = await res.json();
+      const tbody = document.getElementById('historyBody');
+      tbody.innerHTML = data.map(item => `
+        <tr>
+          <td>${item.waktu.split(' ')[1]}</td>
+          <td><code style="color:var(--secondary)">${item.user_id}</code></td>
+          <td><small>${item.metode}</small></td>
+        </tr>
+      `).join('');
+      document.getElementById('syncStatus').innerText = "✓ Server Connected";
+    } catch (e) { document.getElementById('syncStatus').innerText = "✕ Server Offline"; }
+  }
 
-  startCamBtn.onclick = () => {
-    reader.style.display = 'block';
-    startCamBtn.style.display = 'none';
-    stopCamBtn.style.display = 'flex';
+  // 4. Kamera Logic (QR Code Mode)
+  document.getElementById('startCamBtn').onclick = () => {
+    document.getElementById('reader').style.display = 'block';
+    document.getElementById('startCamBtn').style.display = 'none';
+    document.getElementById('stopCamBtn').style.display = 'block';
 
     html5QrCode = new Html5Qrcode("reader");
-    html5QrCode.start(
-      { facingMode: "environment" }, // Gunakan kamera belakang HP
-      { fps: 10, qrbox: { width: 250, height: 150 } },
-      (decodedText) => {
-        processAttendance(decodedText, "CAMERA");
-      },
-      (errorMessage) => { /* ignore errors */ }
-    ).catch(err => {
-      alert("Kamera tidak ditemukan atau izin ditolak.");
-      stopCamera();
+    html5QrCode.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 },
+      (decodedText) => processAttendance(decodedText)
+    );
+  };
+
+  document.getElementById('stopCamBtn').onclick = () => {
+    html5QrCode.stop().then(() => {
+      document.getElementById('reader').style.display = 'none';
+      document.getElementById('startCamBtn').style.display = 'block';
+      document.getElementById('stopCamBtn').style.display = 'none';
     });
   };
 
-  function stopCamera() {
-    if (html5QrCode) {
-      html5QrCode.stop().then(() => {
-        reader.style.display = 'none';
-        startCamBtn.onclick = () => {
-  reader.style.display = 'block';
-  startCamBtn.style.display = 'none';
-  stopCamBtn.style.display = 'flex';
-
-  html5QrCode = new Html5Qrcode("reader");
-  
-  const config = { 
-    fps: 15, // Ditingkatkan agar lebih cepat menangkap gambar
-    qrbox: { width: 300, height: 150 }, // Area scan dibuat memanjang mengikuti bentuk barcode
-    aspectRatio: 1.0
-  };
-
-  // Tambahkan dukungan format Barcode 1D secara spesifik
-  html5QrCode.start(
-    { facingMode: "environment" }, 
-    config,
-    (decodedText) => {
-      processAttendance(decodedText, "CAMERA");
-    },
-    (errorMessage) => { /* scanning... */ }
-  ).catch(err => {
-    console.error(err);
-    alert("Kamera bermasalah.");
-  });
-};
-  // 4. LOGIKA SCANNER FISIK / RFID (Global Listener)
-  let buffer = "";
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      if (buffer.length > 2) {
-        processAttendance(buffer, "RFID/PHYSICAL");
-        buffer = "";
-      }
-    } else if (e.key.length === 1) {
-      buffer += e.key;
-    }
-    // Clear buffer jika tidak ada input selama 200ms (bukan scanner)
-    setTimeout(() => { if (Date.now() - window.lastScanTime > 200) buffer = ""; }, 200);
-  });
-
-  init();
+  initQR();
+  setInterval(loadHistory, 3000);
+  loadHistory();
 </script>
-
-<script>
-  const SERVER_URL = "http://172.20.10.3:5000"; 
-
-async function processAttendance(scannedID, method = "CAMERA") {
-  new Audio('https://www.soundjay.com/buttons/beep-07a.mp3').play();
-
-  try {
-    // 1. Kirim data ke Python Backend
-    const response = await fetch(`${SERVER_URL}/api/scan`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: scannedID, metode: method })
-    });
-
-    if (response.ok) {
-      // 2. Jika sukses, perbarui tabel history secara instan
-      loadHistory(); 
-      document.getElementById('syncStatus').innerText = "✓ Berhasil Sinkron Server";
-    }
-  } catch (err) {
-    console.error("Gagal koneksi ke server Python", err);
-    document.getElementById('syncStatus').innerText = "✕ Server Offline";
-  }
-}
-
-// Fungsi untuk mengambil data history dari database Python
-async function loadHistory() {
-  try {
-    const response = await fetch(`${SERVER_URL}/api/history`);
-    const data = await response.json();
-    
-    const tbody = document.getElementById('historyBody');
-    tbody.innerHTML = ""; // Bersihkan tabel lama
-
-    data.forEach(item => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td><b>${item.waktu}</b></td>
-        <td><code style="color:var(--secondary)">${item.user_id}</code></td>
-        <td><small>${item.metode}</small></td>
-        <td><span class="status-badge">TERVERIFIKASI</span></td>
-      `;
-      tbody.appendChild(row);
-    });
-  } catch (err) {
-    console.log("Gagal load history");
-  }
-}
-
-// Jalankan loadHistory setiap 3 detik untuk efek Real-Time antar perangkat
-setInterval(loadHistory, 3000);
-loadHistory();
-</script>
-
 </body>
-
 </html>
