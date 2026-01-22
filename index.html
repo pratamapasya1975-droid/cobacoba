@@ -206,14 +206,32 @@
     if (html5QrCode) {
       html5QrCode.stop().then(() => {
         reader.style.display = 'none';
-        startCamBtn.style.display = 'flex';
-        stopCamBtn.style.display = 'none';
-      });
-    }
-  }
+        startCamBtn.onclick = () => {
+  reader.style.display = 'block';
+  startCamBtn.style.display = 'none';
+  stopCamBtn.style.display = 'flex';
 
-  stopCamBtn.onclick = stopCamera;
+  html5QrCode = new Html5Qrcode("reader");
+  
+  const config = { 
+    fps: 15, // Ditingkatkan agar lebih cepat menangkap gambar
+    qrbox: { width: 300, height: 150 }, // Area scan dibuat memanjang mengikuti bentuk barcode
+    aspectRatio: 1.0
+  };
 
+  // Tambahkan dukungan format Barcode 1D secara spesifik
+  html5QrCode.start(
+    { facingMode: "environment" }, 
+    config,
+    (decodedText) => {
+      processAttendance(decodedText, "CAMERA");
+    },
+    (errorMessage) => { /* scanning... */ }
+  ).catch(err => {
+    console.error(err);
+    alert("Kamera bermasalah.");
+  });
+};
   // 4. LOGIKA SCANNER FISIK / RFID (Global Listener)
   let buffer = "";
   document.addEventListener('keydown', (e) => {
@@ -287,4 +305,5 @@ loadHistory();
 </script>
 
 </body>
+
 </html>
